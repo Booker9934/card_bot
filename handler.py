@@ -1,5 +1,7 @@
 import time
 import asyncio
+
+from aiogram.exceptions import TelegramBadRequest
 from aiogram.types import Message, CallbackQuery, InlineKeyboardMarkup, InlineKeyboardButton
 from aiogram import Router, F
 from aiogram.filters import Command
@@ -146,30 +148,32 @@ async def cl(callback: CallbackQuery, state: FSMContext):
                 for card in cards:
                     mes += f"{card.text_back} {card.id} {card.group}\n"
                 await callback.message.edit_text(mes, reply_markup=kb_back)
+        try:
+            #Возвращает из просмотра всех карточек в просмотр всех групп
+            if callback.data == "back":
+                builder = InlineKeyboardBuilder()
+                cards = await session.scalars(select(Cards))
+                groups = []
+                for card in cards:
+                    if card.group not in groups:
+                        groups.append(card.group)
+                        builder.button(text=f'{card.group}', callback_data=f"Группа {card.group}")
+                builder.button(text="Все группы", callback_data='All')
+                builder.adjust(1)
+                keyboard = builder.as_markup()
+                await callback.message.edit_text("Выберете группу", reply_markup=keyboard)
 
-        #Возвращает из просмотра всех карточек в просмотр всех групп
-        if callback.data == "back":
-            builder = InlineKeyboardBuilder()
-            cards = await session.scalars(select(Cards))
-            groups = []
-            for card in cards:
-                if card.group not in groups:
-                    groups.append(card.group)
-                    builder.button(text=f'{card.group}', callback_data=f"Группа {card.group}")
-            builder.button(text="Все группы", callback_data='All')
-            builder.adjust(1)
-            keyboard = builder.as_markup()
-            await callback.message.edit_text("Выберете группу", reply_markup=keyboard)
-
-        #Показывает все карточки из всех групп
-        if callback.data == "All":
-            cards = await session.scalars(select(Cards))
-            mes = ""
-            kb_back = InlineKeyboardMarkup(
-                inline_keyboard=[[InlineKeyboardButton(text="Вернуться", callback_data="back")]])
-            for card in cards:
-                mes += f"{card.text_back} {card.id} {card.group}\n"
-            await callback.message.edit_text(mes, reply_markup=kb_back)
+            #Показывает все карточки из всех групп
+            if callback.data == "All":
+                cards = await session.scalars(select(Cards))
+                mes = ""
+                kb_back = InlineKeyboardMarkup(
+                    inline_keyboard=[[InlineKeyboardButton(text="Вернуться", callback_data="back")]])
+                for card in cards:
+                    mes += f"{card.text_back} {card.id} {card.group}\n"
+                await callback.message.edit_text(mes, reply_markup=kb_back)
+        except TelegramBadRequest:
+            await callback.message.answer("Сначала создайте карточку")
 
         #Показывает доп информацию после правильного или неправильного ответа
         if callback.data == "watch_back":

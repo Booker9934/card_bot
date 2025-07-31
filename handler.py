@@ -108,27 +108,27 @@ async def show_current_card(message: Message, state: FSMContext):
     cards = data['cards']
     current_index = data['current_index']
     indexs = data['indexs']
-    if current_index > indexs[-1]:
-        await message.answer("Все карточки пройдены, приходите позже")
-        await state.clear()
-        await state.update_data(current_index=current_index, indexs=indexs, cards=cards)
-        return
-    async with async_session() as session:
-        try:
-            card = await session.scalar(select(Cards).where(Cards.id == indexs[current_index]))
-            if time.time() - float(card.time) > 3600 * card.level:
-                if card.photo_id == "Без фото":
-                    await message.answer(f"Слово: {card.text_front}.\nНапишите перевод слова")
-                    card.time = time.time()
-                    await state.set_state(Card.translate)
+    try:
+        if current_index > indexs[-1]:
+            await message.answer("Все карточки пройдены, приходите позже")
+            await state.clear()
+            await state.update_data(current_index=current_index, indexs=indexs, cards=cards)
+            return
+        async with async_session() as session:
+                card = await session.scalar(select(Cards).where(Cards.id == indexs[current_index]))
+                if time.time() - float(card.time) > 3600 * card.level:
+                    if card.photo_id == "Без фото":
+                        await message.answer(f"Слово: {card.text_front}.\nНапишите перевод слова")
+                        card.time = time.time()
+                        await state.set_state(Card.translate)
+                    else:
+                        await message.answer_photo(photo=card.photo_id, caption=f"Слово: {card.text_front}.\nНапишите перевод слова")
+                        await state.set_state(Card.translate)
                 else:
-                    await message.answer_photo(photo=card.photo_id, caption=f"Слово: {card.text_front}.\nНапишите перевод слова")
-                    await state.set_state(Card.translate)
-            else:
-                card.level *= 2
-                await state.update_data(current_index=current_index + 1)
-                await show_current_card(message, state)
-        except IndexError:
+                    card.level *= 2
+                    await state.update_data(current_index=current_index + 1)
+                    await show_current_card(message, state)
+    except IndexError:
             await message.answer("Вы прошли все карточки. Приходите позже")
             await state.clear()
             await state.update_data(current_index=current_index, indexs=indexs, cards=cards)

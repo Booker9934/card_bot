@@ -1,11 +1,9 @@
 import time
 import asyncio
-from traceback import print_tb
-
 from aiogram.types import Message, CallbackQuery, InlineKeyboardMarkup, InlineKeyboardButton
 from aiogram import Router, F
 from aiogram.filters import Command
-from card_bot.db_card import Cards, async_session
+from db_card import Cards, async_session
 from sqlalchemy import select
 from aiogram.fsm.state import State, StatesGroup
 from aiogram.fsm.context import FSMContext

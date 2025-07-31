@@ -1,8 +1,8 @@
 import asyncio
 import logging
 from aiogram import Bot, Dispatcher
-from card_bot.db_card import async_main
-from card_bot.handler import router
+from db_card import async_main
+from handler import router
 from aiogram.fsm.storage.memory import MemoryStorage
 from config import BOT_TOKEN
 storage = MemoryStorage()

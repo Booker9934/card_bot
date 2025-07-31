@@ -1,5 +1,7 @@
 import time
 import asyncio
+from traceback import print_tb
+
 from aiogram.types import Message, CallbackQuery, InlineKeyboardMarkup, InlineKeyboardButton
 from aiogram import Router, F
 from aiogram.filters import Command
@@ -32,8 +34,9 @@ async def ms(message: Message, state: FSMContext):
     """
     data = await state.get_data()
     current_index = data['current_index']
+    indexs = data['indexs']
     async with async_session() as session:
-        card = await session.scalar(select(Cards).where(Cards.id == current_index))
+        card = await session.scalar(select(Cards).where(Cards.id == indexs[current_index]))
         if message.text.lower() == card.text_back.lower():
             kb_info = InlineKeyboardMarkup(inline_keyboard=[[InlineKeyboardButton(text="Посмотреть обратную сторону", callback_data="watch_back")]])
             await message.answer("Вы ответили правильно", reply_markup=kb_info)
@@ -42,6 +45,7 @@ async def ms(message: Message, state: FSMContext):
         else:
             kb_info = InlineKeyboardMarkup(inline_keyboard=[[InlineKeyboardButton(text="Посмотреть обратную сторону", callback_data="watch_back")]])
             await message.answer("Вы ответили Неправильно", reply_markup=kb_info)
+
             card.level = 1
             await session.commit()
         card.time = time.time()
@@ -60,10 +64,14 @@ async def ms(message: Message, state: FSMContext):
 
         #Начало обучения
         if message.text.lower().startswith("начать"):
-                cards = await session.scalars(select(Cards))
-                cards_list = cards.all()
-                await state.update_data(cards=cards_list, current_index=1)
-                await show_current_card(message, state)
+            cards = await session.scalars(select(Cards))
+            cards_list = cards.all()
+            indexs = []
+            for card in cards_list:
+                if time.time() - float(card.time) > 3600 * card.level:
+                    indexs.append(card.id)
+            await state.update_data(cards=cards_list, current_index=0, indexs=indexs)
+            await show_current_card(message, state)
 
         #Показ всех групп
         if message.text.lower() == "показать карты":
@@ -101,25 +109,32 @@ async def show_current_card(message: Message, state: FSMContext):
     data = await state.get_data()
     cards = data['cards']
     current_index = data['current_index']
-    if current_index > len(cards):
+    indexs = data['indexs']
+    if current_index > indexs[-1]:
         await message.answer("Все карточки пройдены, приходите позже")
         await state.clear()
-        await state.update_data(current_index=current_index-1)
+        await state.update_data(current_index=current_index, indexs=indexs, cards=cards)
         return
     async with async_session() as session:
-        card = await session.scalar(select(Cards).where(Cards.id == current_index))
-        if time.time() - card.time > 3600 * card.level:
-            if card.photo_id == "Без фото":
-                await message.answer(f"Слово: {card.text_front}.\nНапишите перевод слова")
-                card.time = time.time()
-                await state.set_state(Card.translate)
+        try:
+            card = await session.scalar(select(Cards).where(Cards.id == indexs[current_index]))
+            if time.time() - float(card.time) > 3600 * card.level:
+                if card.photo_id == "Без фото":
+                    await message.answer(f"Слово: {card.text_front}.\nНапишите перевод слова")
+                    card.time = time.time()
+                    await state.set_state(Card.translate)
+                else:
+                    await message.answer_photo(photo=card.photo_id, caption=f"Слово: {card.text_front}.\nНапишите перевод слова")
+                    await state.set_state(Card.translate)
             else:
-                await message.answer_photo(photo=card.photo_id, caption=f"Слово: {card.text_front}.\nНапишите перевод слова")
-                await state.set_state(Card.translate)
-        else:
-            card.level *= 2
-            await state.update_data(current_index=current_index + 1)
-            await show_current_card(message, state)
+                card.level *= 2
+                await state.update_data(current_index=current_index + 1)
+                await show_current_card(message, state)
+        except IndexError:
+            await message.answer("Вы прошли все карточки. Приходите позже")
+            await state.clear()
+            await state.update_data(current_index=current_index, indexs=indexs, cards=cards)
+            return
 
 @router.callback_query()
 async def cl(callback: CallbackQuery, state: FSMContext):
@@ -162,9 +177,9 @@ async def cl(callback: CallbackQuery, state: FSMContext):
         if callback.data == "watch_back":
             data = await state.get_data()
             current_index = data['current_index']
-            card = await session.scalar(select(Cards).where(Cards.id == current_index))
-            print(current_index)
-            tim = (card.level * 3600 - (time.time()-card.time)) / 3600
+            indexs = data['indexs']
+            card = await session.scalar(select(Cards).where(Cards.id == indexs[current_index-1]))
+            tim = (card.level * 3600 - (time.time()-float(card.time))) / 3600
             await callback.message.edit_text(f"{card.text_back}\nПовторениее карточки будет через {tim} часов")
     # async with async_session() as session:
     #     i = await state.get_data()

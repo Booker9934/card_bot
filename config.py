@@ -1,0 +1,1 @@
+BOT_TOKEN = "7577255708:AAERi1UUqzu1NdCjkiQxsMr21xGWv1FCZks" #Сюда писать свой токен бота

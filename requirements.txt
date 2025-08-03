@@ -1,3 +1,4 @@
 aiogram==3.0.0b7  # Фреймворк для Telegram бота
 sqlalchemy==2.0.23  # ORM для работы с базой данных
 aiosqlite==0.19.0  # Асинхронный драйвер SQLite для SQLAlchemy
+python-dotenv==1.1.1

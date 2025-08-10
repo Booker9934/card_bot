@@ -1,6 +1,6 @@
-from card_bot.models.models import Card
-from card_bot.database import async_session
-from card_bot.states import CardState
+from ..models.models import Card
+from ..database import async_session
+from ..states import CardState
 
 from aiogram.types import Message
 from aiogram.fsm.context import FSMContext

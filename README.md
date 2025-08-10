@@ -30,7 +30,8 @@ cd card-bot
 BOT_TOKEN="ваш_токен_бота"
 
 3.Прописать в терминал:\
-pip install -r requirements.txt
+pip install -r card-bot/requirements.txt 
+
 
 4.Запустить бота:
 python main.py

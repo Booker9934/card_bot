@@ -6,8 +6,8 @@ import os
 from aiogram import Bot, Dispatcher
 from aiogram.fsm.storage.memory import MemoryStorage
 
-from card_bot.Handlers import card_create, delete_card, learn, show_cards, start
-from card_bot.database import async_main
+from Handlers import card_create, delete_card, learn, show_cards, start
+from database import async_main
 storage = MemoryStorage()
 
 load_dotenv()

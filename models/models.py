@@ -1,6 +1,7 @@
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 from datetime import datetime
-from card_bot.database import Base
+
+from ..database import Base
 
 class Card(Base):
     __tablename__ = "cards"

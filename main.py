@@ -4,9 +4,10 @@ from dotenv import load_dotenv
 import os
 
 from aiogram import Bot, Dispatcher
-from db_card import async_main
-from handler import router
 from aiogram.fsm.storage.memory import MemoryStorage
+
+from card_bot.Handlers import card_create, delete_card, learn, show_cards, start
+from card_bot.database import async_main
 storage = MemoryStorage()
 
 load_dotenv()
@@ -18,7 +19,11 @@ dp = Dispatcher(storage=storage)
 
 async def main():
     await async_main()
-    dp.include_router(router)
+    dp.include_router(card_create.router_create)
+    dp.include_router(delete_card.router_delete)
+    dp.include_router(learn.router_learn)
+    dp.include_router(show_cards.router_show)
+    dp.include_router(start.router_start)
     await dp.start_polling(bot)
 
 if __name__ == "__main__":

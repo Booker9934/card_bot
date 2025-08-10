@@ -4,9 +4,9 @@ from aiogram.fsm.state import State
 from aiogram.fsm.context import FSMContext
 from aiogram.filters import Command
 
-from ..states import CardDelete
-from ..database import async_session
-from ..models.models import Card
+from card_bot.states import CardDelete
+from card_bot.database import async_session
+from card_bot.models.models import Card
 
 from sqlalchemy import select
 

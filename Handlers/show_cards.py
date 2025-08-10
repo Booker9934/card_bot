@@ -3,9 +3,9 @@ from aiogram.exceptions import TelegramBadRequest
 from aiogram.types import Message, CallbackQuery
 from aiogram.filters import Command
 
-from ..database import async_session
-from ..models.models import Card
-from ..keyboards.keyboards import builder_markup, back_from_groups_kb
+from card_bot.database import async_session
+from card_bot.models.models import Card
+from card_bot.keyboards.keyboards import builder_markup, back_from_groups_kb
 
 from sqlalchemy import select
 

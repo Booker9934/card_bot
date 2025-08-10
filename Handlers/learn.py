@@ -3,11 +3,11 @@ from aiogram.types import Message, CallbackQuery
 from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
 
-from ..services.learning_service import show_current_card
-from ..database import async_session
-from ..models.models import Card
-from ..states import CardState
-from ..keyboards.keyboards import back_info
+from card_bot.services.learning_service import show_current_card
+from card_bot.database import async_session
+from card_bot.models.models import Card
+from card_bot.states import CardState
+from card_bot.keyboards.keyboards import back_info
 
 from sqlalchemy import select
 import time

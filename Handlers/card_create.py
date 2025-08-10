@@ -4,11 +4,9 @@ from aiogram.fsm.state import State, StatesGroup
 from aiogram.filters import Command
 from aiogram.types import Message
 
-from ..services.card_service import create_card
-from ..models.models import Card
-from ..keyboards.keyboards import main_menu
-from ..states import CreateCardStates
-from ..database import async_session
+from card_bot.services.card_service import create_card
+from card_bot.keyboards.keyboards import main_menu
+from card_bot.states import CreateCardStates
 
 from sqlalchemy import select
 

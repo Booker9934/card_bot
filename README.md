@@ -34,4 +34,4 @@ pip install -r card-bot/requirements.txt
 
 
 4.Запустить бота:
-python main.py
+python -m card_bot.main

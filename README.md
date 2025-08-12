@@ -23,7 +23,7 @@ SQLite
 ### Что бы запустить бота нужно:
 
 1.Прописать в терминал:\
-git clone https://github.com/Booker9934/card-bot.git\
+git clone https://github.com/Booker9934/card-bot.git \
 cd card-bot
 
 2.Создайте файл .env в корне проекта и заполните его по образцу:\

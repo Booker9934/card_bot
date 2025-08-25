@@ -1,7 +1,7 @@
 from sqlalchemy import select
 
-from card_bot.database import async_session
-from card_bot.models.models import Card
+from database import async_session
+from models.models import Card
 
 import time
 

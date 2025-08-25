@@ -4,9 +4,9 @@ from aiogram.fsm.state import State, StatesGroup
 from aiogram.filters import Command
 from aiogram.types import Message
 
-from card_bot.services.card_service import create_card
-from card_bot.keyboards.keyboards import main_menu
-from card_bot.states import CreateCardStates
+from services.card_service import create_card
+from keyboards.keyboards import main_menu
+from states import CreateCardStates
 
 from sqlalchemy import select
 

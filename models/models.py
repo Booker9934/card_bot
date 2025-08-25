@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Mapped, mapped_column
 
-from card_bot.database import Base
+from database import Base
 
 class Card(Base):
     __tablename__ = "cards"
